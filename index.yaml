@@ -1,0 +1,462 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: Library API
+  description: API for a Library platform
+  contact:
+    email: emtenan.fallatah1@gmail.com
+
+servers:
+  - url: http://localhost:3000
+
+tags:
+  - name: books
+    description: everything about books
+  - name: users
+    description: everything about users
+  - name: authors
+    description: everything about authors
+  - name: borrows
+    description: everything about borrows
+components:
+  schemas:
+    Books:
+      type: object
+      required:
+        - title
+        - image
+        - authorId
+        - description
+        - isAvailable
+        - bookCopiesQty
+      properties:
+        id:
+          type: number
+          description: the id of the book will be automatically generated in the backend
+        title:
+          type: string
+          description: the title of books
+        image:
+          type: string
+          description: the image of books
+        authorId:
+          type: number
+          description: the author id of books
+        description:
+          type: string
+          description: the description of books
+        isAvailable:
+          type: boolean
+          description: the availability of books
+        bookCopiesQty:
+          type: number
+          description: the copies qty of books
+
+      example:
+        id: 1
+        title: "Introduction to Programming"
+        image: "https://m.media-amazon.com/images/I/91asIC1fRwL._SL1500_.jpg"
+        authorId: 1
+        description: "A beginner's guide to programming."
+        isAvailable: false
+        bookCopiesQty: 5
+
+    Users:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+        - role
+      properties:
+        id:
+          type: number
+          description: the id of users will be automatically generated in the backend
+        firstName:
+          type: string
+          description: the first name of the users
+        lastName:
+          type: string
+          description: the last name of the users
+        email:
+          type: string
+          description: the email of the users
+        password:
+          type: string
+          description: the password of the users
+        role:
+          type: string
+          description: the role of the users
+
+      example:
+        id: 1
+        firstName: "John"
+        lastName: "Doe"
+        email: "john.doe@example.com"
+        password: "hashed_password"
+        role: "admin"
+
+    Authors:
+      type: object
+      required:
+        - name
+      properties:
+        id:
+          type: number
+          description: the id of the authors will be automatically generated in the backend
+        name:
+          type: string
+          description: the name of the authors
+
+      example:
+        id: 1,
+        name: "John Doe"
+
+    Borrows:
+      type: object
+      required:
+        - borrowerId
+        - bookId
+        - borrowDate
+        - dueDate
+        - returnDate
+      properties:
+        id:
+          type: number
+          description: the id of borrow will be automatically generated in the backend
+        borrowerId:
+          type: number
+          description: the id of the user who borrowed the book
+        bookId:
+          type: number
+          description: the id of the book that was borrowed
+        borrowDate:
+          type: string
+          description: the date when the book was borrowed
+        dueDate:
+          type: string
+          description: the date when the book was returned
+        returnDate:
+          type: string
+          description: The due date for returning the book
+
+      example:
+        id: 1
+        borrowerId: 1
+        bookId: 1
+        borrowDate: "2023-09-18"
+        returnDate: null
+        dueDate: "2023-10-18"
+
+paths:
+  /books:
+    get:
+      tags:
+        - books
+      summary: get a list of books
+      responses:
+        200:
+          description: all the books are returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Books"
+
+        500:
+          description: Server Error
+    post:
+      tags:
+        - books
+      summary: create a book
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Books"
+      responses:
+        201:
+          description: single book is created
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Books"
+
+        500:
+          description: Server Error
+
+  /books/{bookId}:
+    get:
+      tags:
+        - books
+      summary: get a single book
+      parameters:
+        - in: path
+          name: bookId
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: single book is returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Books"
+
+        500:
+          description: Server Error
+
+    delete:
+      tags:
+        - books
+      summary: delete a single book
+      parameters:
+        - in: path
+          name: bookId
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: delete a single book
+        500:
+          description: Server Error
+    put:
+      tags:
+        - books
+      summary: update a single book
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Books"
+      parameters:
+        - in: path
+          name: bookId
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: updated a single book
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Books"
+        500:
+          description: Server Error
+
+  /books/search:
+    get:
+      tags:
+        - books
+      summary: search books
+      parameters:
+        - in: query
+          name: search
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: All books are returned base d on search value
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Books"
+
+        500:
+          description: Server Error
+  /users:
+    get:
+      tags:
+        - users
+      summary: get a list of users
+      responses:
+        200:
+          description: All users are returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Users"
+
+        500:
+          description: Server Error
+    post:
+      tags:
+        - users
+      summary: create a single user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Users"
+      responses:
+        201:
+          description: single user is created
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Users"
+
+        500:
+          description: Server Error
+  /users/{id}:
+    get:
+      tags:
+        - users
+      summary: get a single book
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: single user is returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Users"
+
+        500:
+          description: Server Error
+    delete:
+      tags:
+        - users
+      summary: delete a single user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: delete a single user
+        500:
+          description: Server Error
+    put:
+      tags:
+        - users
+      summary: update a single user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Users"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: updated a single user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Users"
+        500:
+          description: Server Error
+
+  /users/register:
+    post:
+      tags:
+        - users
+      summary: Register a New User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Users"
+      responses:
+        201:
+          description: User registered successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Users"
+
+  /users/login:
+    post:
+      tags:
+        - users
+      summary: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        200:
+          description: User authenticated successfully
+        404:
+          description: Unauthorized
+        500:
+          description: Server Error
+
+  /users/logout:
+    post:
+      tags:
+        - users
+      summary: logout
+      responses:
+        200:
+          description: User logged out successfully
+        500:
+          description: Server Error
+
+  /authors:
+    get:
+      tags:
+        - authors
+      summary: get a list of authors
+      responses:
+        200:
+          description: All authors are returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Authors"
+
+        500:
+          description: Server Error
+
+  /borrows:
+    get:
+      tags:
+        - borrows
+      summary: get a list of borrows
+      responses:
+        200:
+          description: All borrows are returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Borrows"
+
+        500:
+          description: Server Error
